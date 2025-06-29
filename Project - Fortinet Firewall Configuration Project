@@ -1,0 +1,62 @@
+Fortinet Firewall Configuration Project
+![alt text](https://img.shields.io/badge/Status-Completed-success)
+
+![alt text](https://img.shields.io/badge/Language-English-blue)
+
+![alt text](https://img.shields.io/badge/License-MIT-green)
+This repository documents a graduation project focused on designing and implementing a comprehensive, layered security infrastructure for a corporate network using a Fortinet Firewall. The project was approached from the perspective of a Security Engineer.
+Author: Haydar Can Kotanoglu
+Training Institution: Oak Academy
+Project Duration: 22 - 25 May 2025
+🎯 Project Objectives
+The primary goal of this project was to build a robust and multi-layered security architecture on a Fortinet Firewall. The key objectives were as follows:
+1. Network Segmentation and Controlled Access
+Create distinct network segments: LAN1, LAN2, and DMZ.
+Manage traffic flow between these segments and the internet using strict security policies.
+2. Specific Protocol Permissions
+Allow only SSH and ICMP traffic between Linux devices.
+Allow only RDP traffic between Windows devices.
+3. Service Deployment and Secure Publishing
+Install OpenSSH on a Windows server to provide a secure management alternative to RDP.
+Deploy an Apache Web Server on a Linux server and configure it to serve content on multiple ports (80, 8080, 9090).
+4. Advanced NAT and Routing
+Port Forwarding: Use a Virtual IP (VIP) to forward external requests on port 8080 to the internal web server.
+Outbound NAT: Enable NAT for all traffic originating from internal networks and destined for the WAN.
+5. Integration of Advanced Security Profiles
+Application Control: Block specific applications (e.g., Facebook, Gmail, Skype).
+Web Filtering: Block undesirable web categories (e.g., Adult Content) and specific URLs (e.g., facebook.com).
+Antivirus: Scan traffic for malware and prevent the download of known test viruses (EICAR).
+Intrusion Prevention System (IPS): Block traffic matching critical and high-severity attack signatures.
+File Filtering: Prevent the transfer of specific file extensions (e.g., .zip) over the network.
+6. DNS Configuration and Forwarding
+DNS Filtering: Intercept DNS queries for a specific domain (example.com) and redirect them to a server in the DMZ.
+Local DNS Server: Set up a DNS server in the DMZ to resolve a custom domain (grad1.grad1.com) to an internal web server, making it accessible by name.
+7. Logging and Verification
+Verify and document all configurations and policy actions through text-based evidence from log files.
+✅ Project Achievements
+All project objectives were successfully met. Each configuration was implemented and validated with text-based evidence from logs and command-line outputs.
+1. Network Access Policies Implemented
+Linux SSH/ICMP Traffic: Bi-directional SSH and ICMP traffic between Linux devices on LAN1 and LAN2 was successfully allowed and logged under Policy ID: 12.
+Windows RDP Traffic: Bi-directional RDP traffic between Windows devices was successfully allowed and logged under Policy ID: 33.
+NAT for Internet Access: Outbound NAT was enabled for internet traffic, while internal LAN-to-LAN traffic was correctly routed directly without NAT.
+2. Service Deployment and Access Confirmed
+OpenSSH on Windows: The OpenSSH service was activated on the Windows server (10.10.5.3), a firewall rule was added, and a successful connection was established via ssh std@10.10.5.2.
+Apache Web Server on Linux: The Apache server was configured to listen on ports 80, 8080, and 9090. Accessing http://192.168.1.3:9090 from LAN1 displayed the "It works!" page, and the GET request was recorded in the Apache access.log.
+Port Forwarding with VIP: A Virtual IP object was created to forward traffic from 10.10.5.1:8080 to the LAN2 web server at 192.168.1.3:8080. This was successfully verified by accessing the address from a client browser.
+3. Advanced Security Policies and Filtering Enabled
+Implicit Deny Rule: The default block-all rule was proven effective by logging blocked NTP traffic under Policy ID: Implicit Deny.
+Internet Access Control: LAN2 was granted unrestricted internet access, while LAN1 was successfully blocked from accessing example.com and 1.1.1.1 via a DENY rule.
+Application Control: A profile was created to block Facebook, Gmail, and Skype. All 31 related signatures were successfully blocked for LAN2 outbound traffic.
+Web Filtering: A policy was used to block the "Adult/Mature Content" category and the URL facebook.com for LAN1. Access attempts resulted in a "Web Page Blocked" notification.
+Antivirus: An attempt to download the EICAR test virus was successfully blocked by the antivirus profile, triggering a browser security warning.
+Intrusion Prevention System (IPS): The IPS profile was configured to block critical and high-severity threats, successfully protecting the internal network.
+File Filtering: The transfer of .zip files via HTTP was successfully blocked, confirmed by a "Couldn't download - Network issue" error during a test with a Python web server.
+4. DMZ and DNS Configurations Verified
+DNS Filtering: DNS queries for example.com were intercepted by the FortiGate DNS filter and resolved to the IIS web server in the DMZ (10.1.10.2). This was confirmed with nslookup and by accessing the IIS page in a browser.
+Local DNS Server: An A record for grad1.grad1.com was created on the DMZ DNS server, pointing to the Linux web server's IP (192.168.1.3). nslookup correctly resolved the name, and the Apache page was successfully displayed in a browser.
+🎯 Unrealized Targets
+All objectives defined in the project plan were successfully completed. As detailed in the 'Project Achievements' section, all fundamental and advanced configurations were implemented and verified with evidence. Therefore, there are no unrealized targets within the scope of this project.
+📝 Project Summary and Methodology
+Project Context: This report was prepared from a Security Engineer's perspective to demonstrate how a realistic corporate network security infrastructure can be configured using a Fortinet Firewall.
+Methodology: To enhance the technical depth and professionalism of the report, evidence was presented using text-based log entries, command-line outputs, and configuration details rather than visual screenshots. This approach demonstrates a deep understanding of the work performed.
+General Conclusion: The project successfully resulted in the creation of a comprehensive security infrastructure with a layered and effective security posture, covering network segmentation, controlled access, and threat prevention. This document transparently details all configurations and verification steps.
