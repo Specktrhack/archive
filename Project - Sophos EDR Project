@@ -1,0 +1,108 @@
+Sophos EDR Project: Installation, Policy Configuration, and Cybersecurity Operations
+![alt text](https://img.shields.io/badge/Status-Completed-success)
+
+![alt text](https://img.shields.io/badge/Language-English-blue)
+
+![alt text](https://img.shields.io/badge/License-MIT-green)
+This repository documents a graduation project covering the installation, configuration, and operational use of the Sophos EDR solution. The project includes agent deployment, multi-layered policy creation, and simulated cybersecurity incident response scenarios.
+Author: Haydar Can Kotanoglu
+Training Institution: Oak Academy
+Project Date: 30.05.2025
+📖 Project Overview
+The primary goal of this project is to practically apply the fundamental management functions of the Sophos EDR solution, including security policy configuration and basic cybersecurity operations (threat detection, response, reporting). The scope begins with agent installation on designated virtual machines and extends to creating, testing, and simulating incident response scenarios based on multi-layered security policies.
+🛠️ Project Tasks and Execution
+Task 1: Agent Installation
+Objective: To install the Sophos agent on a designated Windows client (Std/4, IP: 10.10.1.14) and a Linux server (LnxSrv2, IP: 10.10.1.52) and verify their communication with the Sophos Central management console.
+Execution Summary:
+Sophos Central Access: Successfully logged into the Sophos Central dashboard.
+Windows Client Installation:
+Navigated to the "Protect Devices" section and downloaded the "Complete Windows Installer."
+Transferred the SophosSetup.exe installer to the Windows VM and executed it with administrative privileges. The installation completed without issues.
+Linux Server Installation:
+Copied the wget command for the Linux installer from the "Installers" section.
+Connected to the Linux server via SSH.
+Downloaded the SophosInstall.sh script using the wget command.
+Encountered an Issue: The initial installation attempt failed with an SSL certificate error ("certificate is not yet valid") and an inability to connect to the Sophos Update Service (SUS).
+Root Cause Analysis: The issue was traced to an incorrect system time on the Linux server.
+Resolution: The system time was corrected manually using sudo date -s "2025-05-30 20:45:00", and NTP synchronization was enabled with sudo timedatectl set-ntp true.
+After correcting the time, the installation script was re-run and completed successfully, displaying the "Successfully registered with Sophos Central" message.
+Verification: Both the Windows client and the Linux server appeared in the "Computers" and "Servers" lists in Sophos Central with a current "Last Active" time and a "Healthy" status.
+💡 Important Note: The SSL certificate error encountered on the Linux server is a common issue, especially in isolated or virtual environments. Correct system time is a fundamental requirement for secure (SSL/TLS) communication. This step was a critical demonstration of practical problem-solving skills.
+Task 2: Custom Security Policy Configuration
+Objective: To create custom security policies for all manageable Sophos EDR modules, tailored to specific security requirements, and assign them to the relevant devices instead of using the default (Base) policies.
+Execution Summary:
+General Approach: For each security module, a new policy was created via the "Add Policy" button. Policies were given descriptive names (e.g., Ozel_TP_Calisan_HaydarCan). The settings in each policy were configured to be stricter than the defaults and were then assigned to the target devices.
+Configured Modules and Customizations:
+Threat Protection:
+Enabled all advanced protection features, including Live Protection, Deep Learning, CryptoGuard (Ransomware Protection), and Exploit Prevention.
+Set the action for low-reputation files to "Block."
+Enabled the setting to Allow computers to isolate themselves on red health.
+Scheduled a weekly full and deep scan.
+Web Control:
+Blocked risky file downloads and inappropriate website categories (e.g., Gamble, Adult).
+Enabled data loss prevention and event logging options.
+Application Control:
+For the Client: Blocked categories such as P2P, games, and unapproved remote access tools.
+For the Server: Adopted a much more restrictive approach, blocking nearly all application categories not directly related to the server's primary function.
+Peripheral Control:
+Set the default action for USB Storage Devices to "Block."
+Blocked other risky peripherals like Bluetooth and modems.
+Data Loss Prevention (DLP):
+Blocked the transfer of data containing "Credit Card Numbers" to removable storage.
+Defined rules to "Warn user" or "Block" the upload of files containing keywords like "Secret Project" via web browsers.
+Update Management:
+Configured a custom schedule to check for updates more frequently (e.g., every 4 hours).
+Windows Firewall:
+Applied only to the Windows client.
+Set the default inbound connections for PUBLIC and PRIVATE networks to "Block All." This initially broke the RDP connection, which was then restored by adding a specific "Allow" rule for TCP port 3389.
+Device Encryption:
+Targeted only the Windows client.
+Configured to encrypt all fixed disks and require authentication at startup.
+💡 Best Practice Note: Cloning or creating new custom policies instead of directly modifying the Base Policy is a best practice. It simplifies testing and reduces the risk of causing a widespread issue. The process of breaking and then fixing RDP access with the Windows Firewall policy is a perfect example of demonstrating the immediate impact and importance of correct policy configuration.
+Task 3: Testing Internet Access Restrictions (Web Control)
+Objective: To test the effectiveness of the custom "Web Control" policy applied to the Windows client.
+Execution Summary:
+An attempt was made to access a site belonging to the "Gamble" category (e.g., iddaa.com), which was set to "Block" in the policy.
+Result: The browser displayed a Sophos block page, indicating that the site was blocked as per the policy.
+Access to sites in categories set to "Warn" correctly displayed a warning page, giving the user the option to proceed.
+Task 4: Malware Test (EICAR)
+Objective: To test the "Threat Protection" policy's ability to detect, block, and report the industry-standard EICAR test file.
+Execution Summary:
+The EICAR test file was introduced to the Windows client by downloading it from eicar.org.
+Result: The moment the file was written to disk, the Sophos Endpoint Agent detected the threat with a toast notification and automatically blocked/quarantined it.
+A high-priority EICAR-AV-Test alert was generated in the Sophos Central console for the device.
+The "Events" and "Detections" logs recorded details of the threat, including the file path and the action taken ("Cleaned up" or "Quarantined").
+💡 Important Note: The EICAR test is a quick and safe method to verify that a security product's most basic detection layer is functioning. In a real production environment, it is a professional courtesy to inform the relevant security teams before conducting this test to prevent false alarms and unnecessary panic.
+Task 5: Device Isolation and Live Discover (Live Query)
+Objective: To isolate a suspicious device from the network after a threat and perform a forensic investigation using the "Live Discover" feature.
+Execution Summary:
+Device Isolation: The Windows client (where EICAR was detected) was isolated from the network using the "Isolate" option in the Sophos Central console. The device's status quickly updated to "Isolated."
+Live Discover:
+Navigated to the "Threat Analysis Center" -> "Live Discover."
+With the isolated device as the target, several of Sophos's pre-built, SQL-based queries were executed, including:
+Running Processes
+Sophos Detections on Endpoint
+Recent Network Connections
+Recently Created Files
+Investigation: Since EICAR is harmless, no additional anomalous findings were discovered. However, these queries demonstrated the practical ability to understand what is happening on a system, control threat proliferation, and perform forensic analysis in a real incident.
+De-isolation: After the investigation, the device was removed from isolation using the "Remove from Isolation" option.
+💡 Important Note: Device isolation is one of the most effective response methods to prevent the lateral movement of a threat, such as ransomware or a worm. "Live Discover" is a powerful tool not only for incident response but also for proactive threat hunting.
+Task 6: Log and Report Generation
+Objective: To describe how typical daily and weekly security reports can be generated using the "Logs & Reports" module in Sophos Central.
+Execution Summary:
+Log Sources: All available log sources, including "Events," "Alerts," "Threat Detections," and "Audit Logs," were reviewed, noting their filterable nature.
+Pre-defined Reports: Templates like "Executive Summary," "Threat Report," and "Web Usage Report" were observed to be customizable, exportable, and schedulable.
+Daily Reporting Process (Described):
+Focus: Critical alerts, new threats, significant policy violations, and devices with "bad" health status from the last 24 hours.
+Method: Filtering the "Alerts" and module-specific event logs for the last 24 hours.
+Weekly Reporting Process (Described):
+Focus: Overall threat trends, top policy violations, general device health, and a summary of significant events from the last 7 days.
+Method: Running the "Executive Summary" and "Threat Report" templates for the "Last 7 Days" and analyzing weekly trends.
+🏁 Conclusion
+Throughout this project, the installation of the Sophos EDR solution, the creation and assignment of multi-layered security policies (Threat Protection, Web Control, Application Control, etc.), threat simulation (EICAR), incident response actions (isolation, Live Query), and reporting capabilities were practically experienced. The ease of centralized management, comprehensive security features, and flexible incident response capabilities of Sophos Central were successfully observed. This project has provided significant knowledge and valuable practical skills regarding the core operational processes of a modern EDR solution, forming a solid foundation for strengthening cybersecurity infrastructure.
+📜 Disclosures and Limitations
+Controlled Environment Declaration: All installation, configuration, and testing activities within this project were conducted in a controlled virtual laboratory environment, completely isolated from any live production systems.
+Purpose and Scope: The primary purpose of this work is to learn the capabilities of the Sophos EDR solution and to practically apply its core operational processes. This report represents an educational and evaluation exercise.
+Simulation Emphasis: The malware (EICAR) and incident response (device isolation, live query) tests were controlled and safe simulations, not real cyberattacks. The EICAR file is not a real threat.
+Policy Configuration: The security policies created were configured for the purpose of testing the product's features and may not represent generally applicable best practices. Policies for a real corporate environment must be carefully customized based on that organization's specific needs and risk analysis.
+Data Usage: No real, sensitive, or personal data was used during the tests. Any data used in modules like Data Loss Prevention (DLP) was synthetic data created for testing purposes.
