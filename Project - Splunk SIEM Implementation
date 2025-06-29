@@ -1,0 +1,170 @@
+Splunk SIEM Implementation Project
+
+![alt text](https://img.shields.io/badge/Status-Completed-success)
+
+
+![alt text](https://img.shields.io/badge/Language-English-blue)
+
+
+![alt text](https://img.shields.io/badge/License-MIT-green)
+
+This repository documents the implementation of a functional Security Information and Event Management (SIEM) solution using Splunk. The project covers log collection from various sources, security use case development, and the creation of alerts and dashboards for proactive threat detection.
+
+Author: Haydar Can Kotanoglu
+Training Institution: Oak Academy
+Completion Date: 08/06/2025
+
+🎯 Project Objectives
+
+The primary goals of this project were to build a complete, end-to-end SIEM workflow in a controlled lab environment.
+
+1. Log Collection and Integration
+
+Establish centralized logging from designated systems, including a Windows test machine (STD4, 10.10.1.14) and a Linux attack simulation server (10.10.1.52).
+
+Ingest and parse Windows Security, System, Application, and Sysmon logs into the main Splunk index.
+
+Install and configure the Splunk Universal Forwarder on the Linux server to monitor /var/log/syslog.
+
+Integrate Fortinet firewall logs.
+
+2. Environment Setup and Enhancement
+
+Deploy Sysmon on the Windows machine using the advanced configuration file from SwiftOnSecurity for detailed activity monitoring.
+
+Install and configure essential Splunk apps and add-ons, including:
+
+Splunk Common Information Model (CIM)
+
+InfoSec App for Splunk
+
+Splunk Security Essentials
+
+Lookup File Editor, Punchcard, Force Directed, and Sankey Diagram visualizations.
+
+3. Security Use Case Development
+
+Develop and test at least three critical security use cases on the STD4 machine:
+
+Brute-Force Attack Detection: Identify brute-force attempts against system services.
+
+Detection of Processes from Suspicious Locations: Detect processes executing from temporary or user-profile directories commonly abused by malware (e.g., %TEMP%, %APPDATA%).
+
+Geographic Analysis of External Traffic: Geographically map the source IP addresses of incoming internet traffic to analyze attack origins.
+
+4. Alerting and Visualization
+
+Create custom Splunk Processing Language (SPL) queries for each use case.
+
+Configure alerts to trigger on defined threat conditions.
+
+Visualize the results on comprehensive dashboards.
+
+✅ Project Achievements
+
+The foundational log architecture was successfully established, with logs from Windows and Linux endpoints flowing correctly into the Splunk instance.
+
+🛡️ Use Case 1: Brute-Force Attack Detection
+
+Objective: To detect brute-force login attempts against systems.
+
+Data Source: Windows Security Logs (EventCode=4625 - Failed Logon) from the STD4 machine.
+
+Detection Query (SPL):
+
+Generated spl
+index=main sourcetype=WinEventLog:Security EventCode=4625
+| bin _time span=5m
+| stats count by _time, user, src, host
+| where count > 3
+| sort -_time, -count
+
+
+Testing and Validation: A successful RDP brute-force attack was simulated from the Linux machine (10.10.1.52) against the target Windows machine (10.10.1.14) using the Hydra tool with SecLists user/password lists.
+
+Result: The "Multiple Failed Logon Attempts" alert configured on the Splunk dashboard was successfully triggered.
+
+🛡️ Use Case 2: Detection of Processes from Suspicious Locations
+
+Objective: To identify processes running from non-standard, suspicious locations like temporary user folders.
+
+Data Source: Sysmon Logs (EventCode=1 - Process Create) from the STD4 machine.
+
+Detection Query (SPL):
+
+Generated spl
+index=main (EventCode=1 OR EventID=1)
+| search (process_path="*\\Users\\*\\AppData\\*.exe" OR process_path="*\\Temp\\*.exe")
+| stats count by process_name
+| sort -count
+| head 10
+IGNORE_WHEN_COPYING_START
+content_copy
+download
+Use code with caution.
+Spl
+IGNORE_WHEN_COPYING_END
+
+Visualization: The distribution of the top 10 most common processes running from suspicious locations was visualized on the project dashboard using a Pie Chart.
+
+🛡️ Use Case 3: Geographic Analysis of External Traffic
+
+Objective: To geographically analyze the origin of incoming internet traffic.
+
+Data Source: Fortinet Firewall Logs.
+
+Detection Query (SPL):
+
+Generated spl
+index=fortinet*
+| search srcip!="192.168.*" AND srcip!="10.0.0.0/8" AND srcip!="172.16.0.0/12"
+| iplocation srcip
+| where isnotnull(Country)
+| geostats count by Country
+IGNORE_WHEN_COPYING_START
+content_copy
+download
+Use code with caution.
+Spl
+IGNORE_WHEN_COPYING_END
+
+Visualization: The country-based distribution of external source IPs was displayed on a Choropleth Map. In the analyzed dataset, the highest volume of traffic was observed originating from Ukraine.
+
+📈 Overall Result and Challenges
+General Success
+
+The project successfully achieved all defined objectives. A functional SIEM prototype was created on the Splunk platform, capable of processing logs from different sources, proactively detecting at least three critical cybersecurity threats, and presenting the results on meaningful dashboards.
+
+Challenges and Solutions
+
+Time Discrepancies: Mismatches between event timestamps in the Splunk interface and the local time were a recurring challenge.
+
+Data Flow Interruptions: Occasional pauses were observed in the Splunk data pipeline.
+
+GeoIP Configuration: Proper configuration of the GeoIP database was essential for geographic visualizations.
+
+These issues were overcome by carefully verifying timezone settings, ensuring NTP synchronization on source machines like STD4, and using correct Splunk commands.
+
+🚀 Unrealized Targets (Future Enhancements)
+
+While the core objectives were met, the following areas represent potential future enhancements for this project:
+
+Advanced Threat Mitigation: Implementing behavior-based monitoring and sandboxing techniques.
+
+Expanded SIEM Integrations: Integrating other security tools (e.g., EDR, Vulnerability Scanners) for a more holistic view.
+
+Incident Response Drills: Conducting mock incident response exercises to test the preparedness of the organization against real-time threats.
+
+High Availability and Redundancy: Configuring Splunk for high availability to ensure continuous network security monitoring.
+
+📜 Disclosures and Limitations
+
+Controlled Environment Declaration: All installation, configuration, and testing activities were performed in a controlled virtual lab environment, completely isolated from any live production systems.
+
+Educational Purpose: The primary goal of this project was to learn and practically apply the capabilities of a SIEM solution. This report represents an educational exercise.
+
+Simulation Emphasis: The tests performed, including the brute-force attack, were controlled and safe simulations, not real cyberattacks.
+
+Policy Configuration: The security policies and alerts were configured for testing and demonstration purposes and may not represent generally applicable best practices. Real-world policies require careful tuning based on organizational needs.
+
+Data Privacy: Only test data was used. Best security practices for protecting data privacy and confidentiality were followed throughout the project. No real, sensitive, or personal data was handled.
